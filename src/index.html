@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="description" content="Lanello Heights by Masaito Homes: pre-selling two-storey homes in Brgy. Pasong Camachile II, General Trias, Cavite. Pag-IBIG and bank financing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter+Tight:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <?!= include('styles') ?>
+</head>
+<body>
+  <a class="skip" href="#inquiry">Skip to the inquiry form</a>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="Lanello Heights, back to top">
+        <img class="brand-logo" src="<?!= img('logo') ?>" alt="Lanello Heights, Gen. Trias, Cavite" width="480" height="233">
+      </a>
+      <a class="btn btn-ink btn-sm" href="#inquiry" data-cta>Book a house tour</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== 1. HERO ===================== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div class="hero-top">
+          <div class="hero-copy">
+            <p class="badge" data-reveal>Pre-selling now · 425 homes</p>
+            <h1 id="hero-title" class="display hero-title">
+              <span class="line"><span>Your first home,</span></span>
+              <span class="line"><span><em class="accent">finally</em> within</span></span>
+              <span class="line"><span>reach.</span></span>
+            </h1>
+          </div>
+          <div class="hero-aside">
+            <p data-reveal style="--d:.35s">Semi-complete two-storey homes in General Trias, Cavite, on 5.8 hectares at the Imus boundary. Pag-IBIG and bank financing accepted.</p>
+            <div class="btn-row" data-reveal style="--d:.45s">
+              <a class="btn btn-cobalt" href="#inquiry" data-cta>Get the price list</a>
+              <button class="btn btn-outline" type="button" data-video-open>
+                <svg class="play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg>
+                Watch tour
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-band" data-band>
+          <div class="slides" aria-roledescription="carousel" aria-label="Actual photos of Lanello Heights">
+            <figure class="slide is-active"><img src="<?!= img('hero-street') ?>" alt="A row of finished two-storey homes along a Lanello Heights street" fetchpriority="high"></figure>
+            <figure class="slide"><img src="<?!= img('hero-abbie') ?>" alt="The Abbie model with its upper-floor balcony and carport" loading="lazy"></figure>
+            <figure class="slide"><img src="<?!= img('hero-row') ?>" alt="Corner lot and street of single-attached homes" loading="lazy"></figure>
+            <figure class="slide"><img src="<?!= img('hero-corner') ?>" alt="Yellow and white homes beside a landscaped strip" loading="lazy"></figure>
+          </div>
+          <div class="band-shade" aria-hidden="true"></div>
+
+          <ul class="chips" aria-label="Project at a glance">
+            <li class="chip"><strong data-count="5.8" data-decimals="1">5.8</strong><span class="unit">ha</span><small>Project area</small></li>
+            <li class="chip"><strong data-count="425">425</strong><small>Total units</small></li>
+            <li class="chip"><strong data-count="3">3</strong><small>Home models</small></li>
+          </ul>
+
+          <div class="band-foot">
+            <span class="band-caption">Actual site photos · Lanello Heights</span>
+            <div class="dots" role="tablist" aria-label="Choose photo">
+              <button role="tab" aria-label="Photo 1" aria-selected="true"><i></i></button>
+              <button role="tab" aria-label="Photo 2"><i></i></button>
+              <button role="tab" aria-label="Photo 3"><i></i></button>
+              <button role="tab" aria-label="Photo 4"><i></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2. MODEL HOUSES ===================== -->
+    <section class="section models" id="models" aria-labelledby="models-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" data-reveal>01 — Model houses</p>
+            <h2 id="models-title" class="display h2">
+              <span class="line"><span>Three homes.</span></span>
+              <span class="line"><span>One honest finish.</span></span>
+            </h2>
+          </div>
+          <p class="section-lede" data-reveal style="--d:.2s">Every unit is a 2-storey single attached home from the Masaito Design Series, turned over semi-complete.</p>
+        </div>
+
+        <div class="cards">
+          <!-- Source for all model specs: official site sites.google.com/view/lanello-heights (model-house pages). -->
+          <article class="card card-featured" data-reveal style="--d:0s">
+            <div class="card-media" data-reveal="clip">
+              <img src="<?!= img('model-abbie') ?>" alt="Abbie model house exterior" loading="lazy" data-parallax>
+              <span class="badge badge-sm">Most spacious</span>
+            </div>
+            <div class="card-body">
+              <div class="card-title"><h3 class="model-name">Abbie</h3><span class="meta">3 BR · 2 Bath</span></div>
+              <dl class="specs">
+                <div><dt>72.99</dt><dd>sqm floor area</dd></div>
+                <div><dt>88</dt><dd>sqm lot area</dd></div>
+                <div><dt>1</dt><dd>car carport</dd></div>
+              </dl>
+              <a class="card-link" href="#inquiry" data-model="Abbie">Ask about Abbie <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <article class="card" data-reveal style="--d:.12s">
+            <div class="card-media" data-reveal="clip">
+              <img src="<?!= img('model-brenda') ?>" alt="Brenda model house exterior" loading="lazy" data-parallax>
+            </div>
+            <div class="card-body">
+              <!--
+                FLAG — Brenda specs: the design spec says 3BR/2BA, 60 sqm floor / 80 sqm lot (marked UNVERIFIED).
+                The official Lanello Heights site (home, location and model-house/brenda pages, checked 2026-11-11)
+                lists Brenda as 2 BR / 2 T&B, 60 sqm floor area, 77 sqm lot area (TCP ₱4,420,060).
+                The official figures are used below. Confirm with Masaito Homes before launch.
+              -->
+              <div class="card-title"><h3 class="model-name">Brenda</h3><span class="meta">2 BR · 2 Bath</span></div>
+              <dl class="specs">
+                <div><dt>60</dt><dd>sqm floor area</dd></div>
+                <div><dt>77</dt><dd>sqm lot area</dd></div>
+              </dl>
+              <a class="card-link" href="#inquiry" data-model="Brenda">Ask about Brenda <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <article class="card" data-reveal style="--d:.24s">
+            <div class="card-media" data-reveal="clip">
+              <img src="<?!= img('model-chelsea') ?>" alt="Chelsea model house exterior" loading="lazy" data-parallax>
+            </div>
+            <div class="card-body">
+              <div class="card-title"><h3 class="model-name">Chelsea</h3><span class="meta">2 BR · 1 Bath</span></div>
+              <dl class="specs">
+                <div><dt>49</dt><dd>sqm floor area</dd></div>
+                <div><dt>Entry</dt><dd>lowest price point</dd></div>
+              </dl>
+              <a class="card-link" href="#inquiry" data-model="Chelsea">Ask about Chelsea <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 3. FEATURES & AMENITIES ===================== -->
+    <section class="section features" id="features" aria-labelledby="features-title">
+      <div class="wrap features-grid">
+        <div class="features-intro">
+          <p class="eyebrow eyebrow-sun" data-reveal>02 — Features &amp; amenities</p>
+          <h2 id="features-title" class="display h2">
+            <span class="line"><span>Room to <em class="accent accent-light">live</em>, play</span></span>
+            <span class="line"><span>and pray.</span></span>
+          </h2>
+          <p class="muted-light" data-reveal style="--d:.2s">Inside, a home that is ready to finish your way. Outside, a neighborhood with space for the whole family.</p>
+          <a class="text-link text-link-light" href="#inquiry" data-reveal style="--d:.3s">See it in person — book a tour <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="features-lists">
+          <h3 class="list-label" data-reveal>In every home</h3>
+          <ol class="rows">
+            <li class="row" data-reveal data-preview="in-carport"><span class="idx">01</span><span class="row-title">Carport &amp; front yard</span><span class="row-note">Space for a car and a garden</span></li>
+            <li class="row" data-reveal data-preview="in-balcony"><span class="idx">02</span><span class="row-title">Balcony</span><span class="row-note">Upper-floor outdoor nook</span></li>
+            <li class="row" data-reveal data-preview="in-kitchen"><span class="idx">03</span><span class="row-title">Service &amp; utility area</span><span class="row-note">Plus a concrete septic tank</span></li>
+            <li class="row" data-reveal data-preview="in-living"><span class="idx">04</span><span class="row-title">Semi-complete finish</span><span class="row-note">Tiled floors, glazed kitchen counter</span></li>
+          </ol>
+
+          <!--
+            FLAG — Community amenities below follow the design spec. The official amenities page
+            (sites.google.com/view/lanello-heights/amenities) lists: gated entrance, admin office,
+            covered basketball court, multi-purpose hall, playground and jogging path. It does NOT
+            mention a badminton court, billiards room or church. Verify with Masaito Homes before launch.
+          -->
+          <h3 class="list-label" data-reveal>In the community</h3>
+          <ol class="rows">
+            <li class="row" data-reveal data-preview="am-court"><span class="idx">01</span><span class="row-title">Basketball court</span><span class="row-note">Weekend runs with neighbors</span></li>
+            <li class="row" data-reveal><span class="idx">02</span><span class="row-title">Badminton court</span><span class="row-note">Light, social, all ages</span></li>
+            <li class="row" data-reveal><span class="idx">03</span><span class="row-title">Billiards room</span><span class="row-note">Indoor rec space</span></li>
+            <li class="row" data-reveal><span class="idx">04</span><span class="row-title">Church</span><span class="row-note">Faith within the community</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Cursor-follow photo preview for list rows (desktop pointer only). -->
+      <div class="preview" aria-hidden="true">
+        <img data-src-key="in-carport" src="<?!= img('in-carport') ?>" alt="">
+        <img data-src-key="in-balcony" src="<?!= img('in-balcony') ?>" alt="">
+        <img data-src-key="in-kitchen" src="<?!= img('in-kitchen') ?>" alt="">
+        <img data-src-key="in-living" src="<?!= img('in-living') ?>" alt="">
+        <img data-src-key="am-court" src="<?!= img('am-court') ?>" alt="">
+      </div>
+    </section>
+
+    <!-- ===================== 4. LOCATION ===================== -->
+    <section class="section location" id="location" aria-labelledby="location-title">
+      <div class="wrap location-grid">
+        <div class="map-panel" data-reveal="clip">
+          <!-- Coordinates from the official site's Google Map embed (plus code 9W66+4V4, Navarro Rd). -->
+          <div id="map" class="map" data-lat="14.360221" data-lng="120.912148" role="img" aria-label="Map showing Lanello Heights in Pasong Camachile II, General Trias, near the Imus boundary"></div>
+          <span class="map-tag map-tag-top">Imus</span>
+          <span class="map-tag map-tag-bottom">General Trias</span>
+        </div>
+
+        <div class="location-copy">
+          <p class="eyebrow" data-reveal>03 — Location</p>
+          <h2 id="location-title" class="display h2">
+            <span class="line"><span>Right on the</span></span>
+            <span class="line"><span><em class="accent">border</em>.</span></span>
+          </h2>
+          <!-- Note: the official site's map pin is on Navarro Rd; "Daang Hari Extension" comes from the design copy. -->
+          <p class="body-copy" data-reveal style="--d:.2s">Brgy. Pasong Camachile II, General Trias, Cavite, along the Daang Hari Extension. Live where Imus and General Trias meet and use the services of both.</p>
+          <ul class="distances">
+            <li data-reveal><span>Himlayang General Trias</span><strong><b data-count="2.1" data-decimals="1">2.1</b> km</strong></li>
+            <li data-reveal><span>Malagasang Elementary School</span><strong><b data-count="2.9" data-decimals="1">2.9</b> km</strong></li>
+            <li data-reveal><span>Pasong Camachile Elementary</span><strong><b data-count="3.1" data-decimals="1">3.1</b> km</strong></li>
+            <li data-reveal><span>Living Faith School</span><strong><b data-count="3.1" data-decimals="1">3.1</b> km</strong></li>
+          </ul>
+          <a class="text-link" href="#inquiry" data-reveal>Schedule a site visit <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 5. VALUE + INQUIRY ===================== -->
+    <section class="section value" id="inquiry" aria-labelledby="value-title">
+      <div class="wrap value-grid">
+        <div class="value-copy">
+          <p class="eyebrow eyebrow-sun" data-reveal>04 — Value</p>
+          <h2 id="value-title" class="display h2">
+            <span class="line"><span>Every peso is <em class="accent accent-light">well</em></span></span>
+            <span class="line"><span>spent.</span></span>
+          </h2>
+          <!-- ₱3.7M = Chelsea TCP ₱3,712,500 per the official Chelsea bank-financing sheet. -->
+          <dl class="stats">
+            <div class="stat" data-reveal><dt>₱<b data-count="3.7" data-decimals="1">3.7</b>M</dt><dd>Starting point for the 2-bedroom Chelsea.</dd></div>
+            <div class="stat" data-reveal><dt><b data-count="20">20</b> yrs</dt><dd>To pay, through Pag-IBIG or bank financing.</dd></div>
+            <div class="stat" data-reveal><dt>Pre-sell</dt><dd>Introductory pricing while units are still open.</dd></div>
+          </dl>
+        </div>
+
+        <div class="form-card" data-reveal style="--d:.15s">
+          <h3 class="form-title">Book your free house tour</h3>
+          <p class="form-sub">Leave your details and a buyer assistance officer will reach out.</p>
+
+          <form id="inquiry-form" novalidate>
+            <div class="field">
+              <label for="f-name">Full name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Juan Dela Cruz" maxlength="80" required aria-describedby="e-name">
+              <p class="error" id="e-name" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="f-mobile">Mobile number</label>
+              <input id="f-mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" maxlength="16" required aria-describedby="e-mobile">
+              <p class="error" id="e-mobile" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Model of interest</legend>
+              <div class="pills">
+                <label class="pill"><input type="radio" name="model" value="Abbie" checked><span>Abbie</span></label>
+                <label class="pill"><input type="radio" name="model" value="Brenda"><span>Brenda</span></label>
+                <label class="pill"><input type="radio" name="model" value="Chelsea"><span>Chelsea</span></label>
+              </div>
+            </fieldset>
+            <!-- Honeypot (hidden from people, bots fill it). -->
+            <div class="hp" aria-hidden="true"><label>Website <input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+
+            <button class="btn btn-cobalt btn-block" type="submit" id="f-submit">
+              <span class="btn-label">Send my inquiry</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+            <p class="form-status" id="f-status" role="status" aria-live="polite"></p>
+            <p class="form-fine">By sending, you agree to be contacted about Lanello Heights. Prices are indicative and subject to change.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== 6. FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top" aria-label="Lanello Heights, back to top">
+        <img class="brand-logo brand-logo-footer" src="<?!= img('logo-light') ?>" alt="Lanello Heights, Gen. Trias, Cavite" width="480" height="233" loading="lazy">
+      </a>
+      <p class="footer-addr">Brgy. Pasong Camachile II, General Trias, Cavite · A Masaito Homes development</p>
+    </div>
+    <div class="wrap footer-fine">
+      <p>Globe <a href="tel:+639999943304">+63 999 994 3304</a> · Smart <a href="tel:+639669533188">+63 966 953 3188</a> · Mon–Fri, 8am–5pm</p>
+      <p>For inquiries, call or message us today.</p>
+    </div>
+  </footer>
+
+  <!-- ===================== VIDEO MODAL ===================== -->
+  <div class="modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Lanello Heights video tour" hidden>
+    <div class="modal-backdrop" data-video-close></div>
+    <div class="modal-box">
+      <button class="modal-close" type="button" data-video-close aria-label="Close video">×</button>
+      <!-- Video: "Lanello Heights in Pasong Camachile 2 of Masaito Homes", embedded on the official site's home page. -->
+      <div class="video-frame" data-video-id="wkC_NePhvLI" style="background-image:url('<?!= img('video-poster') ?>')"></div>
+      <a class="btn btn-cobalt btn-sm modal-cta" href="#inquiry" data-video-close>Like what you see? Book a tour</a>
+    </div>
+  </div>
+
+  <!-- Mobile sticky CTA -->
+  <a class="sticky-cta btn btn-cobalt" href="#inquiry" data-cta>Book a house tour</a>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <?!= include('script') ?>
+</body>
+</html>

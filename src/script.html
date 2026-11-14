@@ -1,0 +1,393 @@
+<script>
+(function () {
+  'use strict';
+
+  var doc = document.documentElement;
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var motion = 'IntersectionObserver' in window;
+  function isReduced() { return false; }
+
+  doc.classList.add('js');
+  if (motion) doc.classList.add('motion');
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- Smooth in-page links (anchors are unreliable inside the Apps Script iframe) ---------- */
+  function scrollToId(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var top = el.getBoundingClientRect().top + window.pageYOffset - (id === 'top' ? 0 : 8);
+    window.scrollTo({ top: id === 'top' ? 0 : top, behavior: isReduced() ? 'auto' : 'smooth' });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    if (!id) return;
+    e.preventDefault();
+    var model = a.getAttribute('data-model');
+    if (model) selectModel(model);
+    scrollToId(id);
+    if (id === 'inquiry') {
+      setTimeout(function () { var n = $('#f-name'); if (n) n.focus({ preventScroll: true }); }, motion ? 700 : 0);
+    }
+  });
+
+  function selectModel(model) {
+    var r = $('input[name="model"][value="' + model + '"]');
+    if (r) r.checked = true;
+  }
+
+  /* ---------- Masked line indexes for staggering ---------- */
+  $$('.display').forEach(function (h) {
+    $$('.line', h).forEach(function (l, i) { l.style.setProperty('--i', i); });
+  });
+
+  /* ---------- Scroll reveals ---------- */
+  if (motion) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var host = en.target;
+        var targets = (host.__revealTargets || []).slice();
+        if (host.hasAttribute('data-reveal') || host.classList.contains('display')) targets.push(host);
+        io.unobserve(host);
+        targets.forEach(function (t) {
+          t.classList.add('is-in');
+          // Drop the entrance delay afterwards so hover transitions respond instantly.
+          setTimeout(function () { t.style.setProperty('--d', '0s'); }, 1800);
+        });
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+
+    $$('[data-reveal], .display').forEach(function (el) {
+      // Stagger sibling list rows / stats automatically.
+      var p = el.parentElement;
+      if (p && (p.classList.contains('rows') || p.classList.contains('distances') || p.classList.contains('stats')) && !el.style.getPropertyValue('--d')) {
+        el.style.setProperty('--d', (Array.prototype.indexOf.call(p.children, el) * 0.08) + 's');
+      }
+      // A fully clipped element has no visible area, so IO would never fire: watch its parent instead.
+      if (el.getAttribute('data-reveal') === 'clip') {
+        var host = el.parentElement;
+        (host.__revealTargets = host.__revealTargets || []).push(el);
+        io.observe(host);
+        return;
+      }
+      io.observe(el);
+    });
+
+    // Hero runs on load, not on scroll.
+    requestAnimationFrame(function () {
+      $$('.hero [data-reveal], .hero .display').forEach(function (el) { el.classList.add('is-in'); });
+      var band = $('[data-band]');
+      if (band) setTimeout(function () { band.classList.add('is-in'); }, 60);
+    });
+  } else {
+    $$('[data-reveal], .display, [data-band]').forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---------- Count-up numbers ---------- */
+  function countUp(el) {
+    var end = parseFloat(el.getAttribute('data-count'));
+    var dec = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    if (!motion || isNaN(end)) return;
+    var dur = 1400, t0 = null;
+    function tick(t) {
+      if (!t0) t0 = t;
+      var p = Math.min(1, (t - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 4);
+      el.textContent = (end * e).toFixed(dec);
+      if (p < 1) requestAnimationFrame(tick); else el.textContent = end.toFixed(dec);
+    }
+    el.textContent = (0).toFixed(dec);
+    requestAnimationFrame(tick);
+  }
+  if (motion) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        setTimeout(function () { countUp(el); }, el.closest('.chip') ? 1050 : 150);
+        cio.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    $$('[data-count]').forEach(function (el) { cio.observe(el); });
+  }
+
+  /* ---------- Hero slideshow (crossfade + ken burns) ---------- */
+  (function slideshow() {
+    var band = $('[data-band]');
+    if (!band) return;
+    var slides = $$('.slide', band);
+    var dots = $$('.dots button', band);
+    var ms = 5600, i = 0, timer = null;
+    band.style.setProperty('--slide-ms', ms + 'ms');
+
+    function go(n, user) {
+      slides.forEach(function (s) { s.classList.remove('is-prev'); });
+      slides[i].classList.remove('is-active');
+      slides[i].classList.add('is-prev'); // stays opaque underneath while the next one fades in
+      dots[i].setAttribute('aria-selected', 'false');
+      i = (n + slides.length) % slides.length;
+      slides[i].classList.add('is-active');
+      // Restart the progress bar animation.
+      var bar = dots[i].querySelector('i');
+      bar.style.display = 'none'; void bar.offsetWidth; bar.style.display = '';
+      dots[i].setAttribute('aria-selected', 'true');
+      if (user) restart();
+    }
+    function restart() {
+      clearInterval(timer);
+      if (motion) timer = setInterval(function () { go(i + 1); }, ms);
+    }
+    dots.forEach(function (d, n) { d.addEventListener('click', function () { go(n, true); }); });
+    band.addEventListener('mouseenter', function () { clearInterval(timer); band.classList.add('is-paused'); });
+    band.addEventListener('mouseleave', function () { band.classList.remove('is-paused'); restart(); });
+    document.addEventListener('visibilitychange', function () { document.hidden ? clearInterval(timer) : restart(); });
+    if (!motion) band.classList.add('is-paused');
+    restart();
+  })();
+
+  /* ---------- Scroll-linked: parallax, header state, sticky CTA ---------- */
+  (function onScroll() {
+    var header = $('.site-header');
+    var sticky = $('.sticky-cta');
+    var hero = $('.hero');
+    var inquiry = $('#inquiry');
+    var parallax = $$('[data-parallax]');
+    var bandImgs = $$('.slide img');
+    var lastY = window.pageYOffset, ticking = false;
+
+    function update() {
+      ticking = false;
+      var y = window.pageYOffset, vh = window.innerHeight;
+
+      header.classList.toggle('is-scrolled', y > 10);
+      header.classList.toggle('is-hidden', y > 400 && y > lastY + 4);
+      if (y < lastY - 4 || y < 400) header.classList.remove('is-hidden');
+      lastY = y;
+
+      if (sticky) {
+        var inq = inquiry.getBoundingClientRect();
+        var pastHero = hero.getBoundingClientRect().bottom < vh * 0.5;
+        var atForm = inq.top < vh && inq.bottom > 0;
+        sticky.classList.toggle('is-on', pastHero && !atForm);
+      }
+
+      if (!motion || isReduced()) return;
+      bandImgs.forEach(function (img) {
+        var r = img.parentNode.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        img.style.setProperty('--py', Math.min(50, Math.max(0, -r.top) * 0.18).toFixed(1) + 'px');
+      });
+      parallax.forEach(function (img) {
+        var r = img.parentNode.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        var p = (r.top + r.height / 2 - vh / 2) / vh; // -1..1
+        img.style.setProperty('--py', (p * -24).toFixed(1) + 'px');
+      });
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  /* ---------- Feature rows: cursor-follow photo preview ---------- */
+  (function previews() {
+    var box = $('.preview');
+    if (!box || !finePointer || !motion) return;
+    // (Checked per hover below so the motion toggle takes effect without a reload.)
+    var imgs = {};
+    $$('img', box).forEach(function (im) { imgs[im.getAttribute('data-src-key')] = im; });
+    var x = 0, y = 0, cx = 0, cy = 0, raf = null, on = false;
+    function loop() {
+      cx += (x - cx) * 0.16; cy += (y - cy) * 0.16;
+      box.style.transform = 'translate3d(' + (cx + 24) + 'px,' + (cy - 90) + 'px,0) rotate(' + Math.max(-6, Math.min(6, (x - cx) * 0.08)).toFixed(2) + 'deg)';
+      raf = on || Math.abs(x - cx) > 0.5 ? requestAnimationFrame(loop) : null;
+    }
+    $$('.row[data-preview]').forEach(function (row) {
+      row.addEventListener('mouseenter', function (e) {
+        if (isReduced()) return;
+        var key = row.getAttribute('data-preview');
+        Object.keys(imgs).forEach(function (k) { imgs[k].classList.toggle('is-on', k === key); });
+        if (!on) { cx = x = e.clientX; cy = y = e.clientY; }
+        on = true; box.classList.add('is-on');
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      row.addEventListener('mousemove', function (e) { x = e.clientX; y = e.clientY; });
+      row.addEventListener('mouseleave', function () { on = false; box.classList.remove('is-on'); });
+    });
+  })();
+
+  /* ---------- Map: Leaflet + OSM data (CARTO light tiles), Google embed fallback ---------- */
+  (function map() {
+    var el = $('#map');
+    if (!el) return;
+    var lat = parseFloat(el.getAttribute('data-lat')), lng = parseFloat(el.getAttribute('data-lng'));
+    var built = false;
+
+    function fallback() {
+      el.innerHTML = '<iframe title="Lanello Heights on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=15&output=embed"></iframe>';
+    }
+    function build() {
+      if (built) return; built = true;
+      if (!window.L) { fallback(); return; }
+      var m = L.map(el, {
+        center: [lat + 0.002, lng + 0.004], zoom: 14,
+        scrollWheelZoom: false, zoomControl: false, attributionControl: true
+      });
+      L.control.zoom({ position: 'topright' }).addTo(m);
+      // OpenStreetMap tiles (greyscaled in CSS). If OSM refuses tiles, switch to Esri's keyless light-gray canvas.
+      var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(m);
+      var failed = 0, swapped = false;
+      osm.on('tileerror', function () {
+        if (swapped || ++failed < 3) return;
+        swapped = true;
+        m.removeLayer(osm);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 16,
+          attribution: 'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'
+        }).addTo(m);
+      });
+      L.marker([lat, lng], {
+        keyboard: false,
+        icon: L.divIcon({
+          className: 'pin', iconSize: [0, 0],
+          html: '<span class="pin-halo"></span><span class="pin-dot"></span><span class="pin-label">Lanello Heights</span>'
+        })
+      }).addTo(m);
+      // Re-measure once the clip-path reveal finishes.
+      setTimeout(function () { m.invalidateSize(); }, 1500);
+    }
+    // Build when the section nears the viewport (keeps first paint light).
+    if ('IntersectionObserver' in window) {
+      var mio = new IntersectionObserver(function (en) {
+        if (en[0].isIntersecting) { build(); mio.disconnect(); }
+      }, { rootMargin: '400px 0px' });
+      mio.observe(el);
+    } else build();
+  })();
+
+  /* ---------- Video modal ---------- */
+  (function video() {
+    var modal = $('#video-modal');
+    if (!modal) return;
+    var frame = $('.video-frame', modal);
+    var lastFocus = null;
+
+    function open() {
+      lastFocus = document.activeElement;
+      var id = frame.getAttribute('data-video-id');
+      frame.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="Lanello Heights video tour" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(function () { modal.classList.add('is-open'); $('.modal-close', modal).focus(); });
+    }
+    function close() {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      setTimeout(function () { modal.hidden = true; frame.innerHTML = ''; }, motion ? 400 : 0);
+      if (lastFocus) lastFocus.focus({ preventScroll: true });
+    }
+    $$('[data-video-open]').forEach(function (b) { b.addEventListener('click', open); });
+    $$('[data-video-close]', modal).forEach(function (b) { b.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) {
+      if (modal.hidden) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'Tab') { // simple focus trap
+        var f = $$('button, a[href]', modal), first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+  })();
+
+  /* ---------- Inquiry form ---------- */
+  (function form() {
+    var f = $('#inquiry-form');
+    if (!f) return;
+    var name = $('#f-name'), mobile = $('#f-mobile'), btn = $('#f-submit'), status = $('#f-status');
+    var label = $('.btn-label', btn);
+
+    // Same rules as the server (Code.gs normalizeMobile_).
+    function phMobile(v) {
+      var d = String(v || '').replace(/[\s\-().]/g, '');
+      var m = d.match(/^(?:\+?63|0)?(9\d{9})$/);
+      return m ? '+63' + m[1] : '';
+    }
+    function setErr(input, msg) {
+      var e = document.getElementById(input.getAttribute('aria-describedby'));
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      e.textContent = msg || '';
+    }
+    function checkName() {
+      var v = name.value.replace(/\s+/g, ' ').trim();
+      var msg = !v ? 'Please enter your full name.'
+        : v.length < 2 ? 'That name looks too short.'
+        : !/^[A-Za-zÀ-ÖØ-öø-ÿÑñ][A-Za-zÀ-ÖØ-öø-ÿÑñ .,'-]*$/.test(v) ? 'Please use letters only.'
+        : '';
+      setErr(name, msg); return !msg;
+    }
+    function checkMobile() {
+      var v = mobile.value.trim();
+      var msg = !v ? 'Please enter your mobile number.'
+        : !phMobile(v) ? 'Use a PH mobile number, e.g. 0917 123 4567 or +63 917 123 4567.'
+        : '';
+      setErr(mobile, msg); return !msg;
+    }
+    name.addEventListener('blur', function () { if (name.value) checkName(); });
+    mobile.addEventListener('blur', function () { if (mobile.value) checkMobile(); });
+    name.addEventListener('input', function () { if (name.getAttribute('aria-invalid') === 'true') checkName(); });
+    mobile.addEventListener('input', function () { if (mobile.getAttribute('aria-invalid') === 'true') checkMobile(); });
+
+    function setLoading(on) {
+      btn.classList.toggle('is-loading', on);
+      btn.disabled = on;
+      btn.setAttribute('aria-busy', on ? 'true' : 'false');
+      label.textContent = on ? 'Sending…' : 'Send my inquiry';
+    }
+    function show(kind, msg) {
+      status.className = 'form-status ' + (kind === 'ok' ? 'is-ok' : 'is-err');
+      status.textContent = msg;
+    }
+
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.textContent = ''; status.className = 'form-status';
+      var okN = checkName(), okM = checkMobile();
+      if (!okN || !okM) { (okN ? mobile : name).focus(); return; }
+
+      var payload = {
+        name: name.value.replace(/\s+/g, ' ').trim(),
+        mobile: mobile.value.trim(),
+        model: (f.querySelector('input[name="model"]:checked') || {}).value || '',
+        website: f.website.value
+      };
+      setLoading(true);
+
+      var onOk = function (res) {
+        setLoading(false);
+        show('ok', (res && res.message) || 'Thank you! We will be in touch shortly.');
+        f.reset(); selectModel('Abbie');
+        $$('input', f).forEach(function (i) { i.removeAttribute('aria-invalid'); });
+      };
+      var onErr = function (err) {
+        setLoading(false);
+        var msg = (err && err.message) ? err.message.replace(/^Exception:\s*/, '') : '';
+        show('err', msg || 'Sorry, something went wrong. Please try again, or call +63 999 994 3304.');
+      };
+
+      if (window.google && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(onOk).withFailureHandler(onErr).submitInquiry(payload);
+      } else {
+        // Local preview (outside Apps Script): simulate a round trip.
+        setTimeout(function () { onOk({ message: 'Preview mode: inquiry not sent (no Apps Script backend).' }); }, 900);
+      }
+    });
+  })();
+})();
+</script>
